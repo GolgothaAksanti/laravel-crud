@@ -73,12 +73,13 @@ $(document).ready(function () {
                     $("#product-modal").modal("toggle");
 
                     if (response.status === "success") {
-                        $("#response").html(
-                            `<div class='alert alert-success alert-dismissible'>
-                                ${response.message}
-                                <button class='btn btn-close' type='button' data-bs-dismiss='alert'></button>
-                            </div>`
-                        );
+                        Swal.fire({
+                            icon: "success",
+                            title: "Created!",
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
 
                         // update
                         if (productId) {
@@ -117,21 +118,23 @@ $(document).ready(function () {
                             );
                         }
                     } else if (response.status === "failed") {
-                        $("#response").html(
-                            `<div class='alert alert-danger alert-dismissible'>
-                                ${response.message}
-                                <button class='btn btn-close' type='button' data-bs-dismis='alert'></button>
-                            </div>`
-                        );
+                        Swal.fire({
+                            icon: "error",
+                            title: "Failed!",
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
                     }
                 },
                 error: function (error) {
-                    $("#response").html(
-                        `<div class='alert alert-danger alert-dismissible'>
-                            ${response.message}
-                            <button class='btn btn-close' type='button' data-bs-dismis='alert'></button>
-                        </div>`
-                    );
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
                 },
             });
         },
@@ -233,6 +236,7 @@ $(document).ready(function () {
                                     title: "Deleted!",
                                     text: "the product has been deleted.",
                                     icon: "success",
+                                    timer: 1500
                                 });
 
                                 if (response.product) {
@@ -245,6 +249,7 @@ $(document).ready(function () {
                                     title: "Failed!",
                                     text: "Unable to delete product1",
                                     icon: "error",
+                                    timer: 1500,
                                 });
                             }
                         },
@@ -253,6 +258,7 @@ $(document).ready(function () {
                                 title: "Failed!",
                                 text: "Unable to delete product1",
                                 icon: "error",
+                                timer: 1500,
                             });
                         },
                     });
