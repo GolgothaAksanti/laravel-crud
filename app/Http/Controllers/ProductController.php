@@ -90,4 +90,52 @@ class ProductController extends Controller
         return response()->json(['status' => 'failed', 'message' => 'Unable to delete product']);
 
     }
+
+    /**
+     * updateStatuses
+     * @param Request $request
+     */
+    public function updateStatuses(Request $request)
+    {
+        if ($request->productIds) {
+            $products = [];
+
+            foreach ($request->productIds as $productId) {
+                $product = Product::find($productId);
+                if ($product) {
+                    unset($product->title);
+                    unset($product->description);
+                    unset($product->price);
+                    unset($product->created_at);
+                    $products[] = $product;
+
+                    $product['status'] = true;
+                    $product->save();
+                }
+            }
+
+            //Product::whereIn('id', $request->productIds)->update(['status' => true]);
+
+            return response()->json(['status' => 'success', 'message' => 'status updated', 'product' => $products]);
+        }
+
+        return response()->json(['status' => 'failed', 'message' => 'unable to update status']);
+    }
+    /**
+     * Function bulkDelete
+     * @param Request $request
+     */
+    public function bulkDelete(Request $request)
+    {
+        if ($request->productIds) {
+            $reponse = Product::whereIn('id', $request->productIds)->delete();
+
+            if ($reponse) {
+                return response()->json(['status' => 'success', 'message' => 'products deleted']);
+            }
+
+            return response()->json(['status' => 'failed', 'message' => 'unable to delete products']);
+        }
+        return response()->json(['status' => 'failed', 'message' => 'no products found!']);
+    }
 }

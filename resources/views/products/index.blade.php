@@ -3,10 +3,11 @@
     @include('products.subview.create')
 
     <div class="container py-5">
-        <h3 class="text-center">AJAX | JQUERY | LARAVEL</h3>
-        <div class="row">
-            <div class="col-xl-6">
-                <div id="response"></div>
+        <h3 class="text-center fw-bold">AJAX | JQUERY | LARAVEL</h3>
+        <div class="row border-top pt-2">
+            <div class="col-xl-6 text-start">
+                <a href="javascript:void(0)" id="status-btn" class="btn btn-success d-none">Update status</a>
+                <a href="javascript:void(0)" id="bulk-delete-btn" class="btn btn-danger d-none">delete</a>
             </div>
             <div class="col-xl-6 text-end">
                 <a href="javascript:void(0)" id="create-product-btn" class="btn btn-primary">Create Product</a>
@@ -16,17 +17,24 @@
         <div class="table-responsive pt-4">
             <table id="product-table" class="table table-striped">
                 <thead>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Price</th>
-                    <th>Status</th>
-                    <th>Action</th>
+                    <tr>
+                        <th data-orderable="false" class="no-sort"><input type="checkbox" class="form-check-input"
+                                id="select-all" /></th>
+                        <th>Id</th>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
                 </thead>
 
                 <tbody>
                     @forelse ($products as $product)
                         <tr id="{{ 'product_' . $product->id }}">
+                            <td> <input type="checkbox" class="form-check-input product-checkbox"
+                                    value="{{ $product->id }}" />
+                            </td>
                             <td>{{ $product->id }}</td>
                             <td>{{ $product->title }}</td>
                             <td>{{ $product->description }}</td>
