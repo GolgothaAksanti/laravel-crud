@@ -18,6 +18,11 @@
         .error {
             color: #ff0055;
         }
+
+        .no-sort:after,
+        .no-sort:before {
+            content: none !important;
+        }
     </style>
 </head>
 
@@ -41,7 +46,8 @@
 
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js" type="text/javascript"></script>
     <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.min.js" type="text/javascript"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.0/dist/sweetalert2.all.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.11.0/dist/sweetalert2.all.min.js" type="text/javascript">
+    </script>
 
     <script type="text/javascript">
         const baseUrl = "{{ url('/') }}"

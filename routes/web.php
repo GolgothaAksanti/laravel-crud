@@ -19,3 +19,5 @@ Route::get('/', function () {
 });
 
 Route::resource('products', ProductController::class);
+Route::post('products/update-statuses', [ProductController::class, 'updateStatuses'])->name('products.update-statuses');
+Route::post('products/bulk-delete', [ProductController::class, 'bulkDelete'])->name('products.bulk-delete-');

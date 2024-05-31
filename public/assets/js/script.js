@@ -5,6 +5,8 @@ $.ajaxSetup({
 });
 
 $(document).ready(function () {
+    const dataTable = $("#product-table").DataTable();
+
     $("#create-product-btn").click(function () {
         $("#product-modal #title").val("");
         $("#product-modal #price").val("");
@@ -83,19 +85,25 @@ $(document).ready(function () {
 
                         // update
                         if (productId) {
-                            $(`#product_${productId} td:nth-child(2)`).html(
+                            $(`#product_${productId} td:nth-child(3)`).html(
                                 response.product.title
                             );
-                            $(`#product_${productId} td:nth-child(3)`).html(
+                            $(`#product_${productId} td:nth-child(4)`).html(
                                 response.product.description
                             );
-                            $(`#product_${productId}  td:nth-child(4)`).html(
+                            $(`#product_${productId}  td:nth-child(5)`).html(
                                 response.product.price
                             );
                         } else {
                             //create
-                            $("#product-table").append(
-                                `<tr id="product_${response.product.id}">
+
+                            const newProductRow = `<tr id="product_${
+                                response.product.id
+                            }">
+                                    <td> <input type="checkbox" class="form-check-input product-checkbox" value="${
+                                        response.product.id
+                                    }" />
+                                    </td
                                     <td>${response.product.id}</td>
                                     <td>${response.product.title}</td>
                                     <td>${response.product.description}</td>
@@ -114,8 +122,9 @@ $(document).ready(function () {
                                             response.product.id
                                         }">Delete</a>
                                     </td>
-                                </tr>`
-                            );
+                                </tr>`;
+
+                            dataTable.row.add($(newProductRow)).draw(false);
                         }
                     } else if (response.status === "failed") {
                         Swal.fire({
@@ -236,7 +245,7 @@ $(document).ready(function () {
                                     title: "Deleted!",
                                     text: "the product has been deleted.",
                                     icon: "success",
-                                    timer: 1500
+                                    timer: 1500,
                                 });
 
                                 if (response.product) {
@@ -265,5 +274,146 @@ $(document).ready(function () {
                 }
             });
         }
+    });
+
+    $("#select-all").on("click", function () {
+        const checkboxes = $("tbody input[type='checkbox']");
+        checkboxes.prop("checked", $(this).prop("checked"));
+
+        if ($(this).prop("checked")) {
+            $("#status-btn").removeClass("d-none");
+            $("#bulk-delete-btn").removeClass("d-none");
+        } else {
+            $("#status-btn").addClass("d-none");
+            $("#bulk-delete-btn").addClass("d-none");
+        }
+    });
+
+    // update status
+    $("#product-table tbody").on("click", ".product-checkbox", function () {
+        const checkbox = $(this).find('input[type="checkbox"]');
+        checkbox.prop("checked", !checkbox.prop("checked"));
+
+        const totalCheckboxes = $("tbody input[type='checkbox']").length;
+        const totalSelectedCheckboxes = $(".product-checkbox:checked").length;
+
+        if (totalSelectedCheckboxes !== totalCheckboxes) {
+            $("#select-all").prop("checked", false);
+            if ($(".product-checkbox:checked").length > 0) {
+                $("#status-btn").removeClass("d-none");
+                $("#bulk-delete-btn").removeClass("d-none");
+            } else {
+                $("#status-btn").addClass("d-none");
+                $("#bulk-delete-btn").addClass("d-none");
+            }
+        } else {
+            $("#select-all").prop("checked", true);
+        }
+    });
+
+    // update statuses
+    $("#status-btn").on("click", function () {
+        let selectedProducts = [];
+
+        $(".product-checkbox:checked").each(function () {
+            selectedProducts.push($(this).val());
+        });
+
+        if (selectedProducts.length > 0) {
+            $.ajax({
+                url: "products/update-statuses",
+                type: "POST",
+                data: {
+                    productIds: selectedProducts,
+                },
+                success: function (response) {
+                    if (response.status === "success") {
+                        const products = response.product;
+                        $.each(products, function (index, product) {
+                            $(`#product_${product.id} td:nth-child(6)`).html(
+                                product.status ? "Yes" : "No"
+                            );
+                        });
+
+                        Swal.fire({
+                            icon: "success",
+                            title: "Statuses updated!",
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Failed!",
+                            text: response.message,
+                            showConfirmButton: false,
+                            timer: 1500,
+                        });
+                    }
+                },
+                error: function (error) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                },
+            });
+        }
+    });
+
+    // bulk delete function
+    $("#bulk-delete-btn").on("click", function () {
+        let selectedProducts = [];
+
+        $(".product-checkbox:checked").each(function () {
+            selectedProducts.push($(this).val());
+        });
+
+        $.ajax({
+            url: "products/bulk-delete",
+            type: "POST",
+            data: {
+                productIds: selectedProducts,
+            },
+            success: function (response) {
+                if (response.status === "success") {
+                    $(".product-checkbox:checked").each(function () {
+                        dataTable.row($(this).parents("tr")).remove().draw();
+                    });
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "Deleted successful!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+
+                    $("#status-btn").addClass("d-none");
+                    $("#bulk-delete-btn").addClass("d-none");
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 1500,
+                    });
+                }
+            },
+            error: function (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed!",
+                    text: response.message,
+                    showConfirmButton: false,
+                    timer: 1500,
+                });
+            },
+        });
     });
 });
